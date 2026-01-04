@@ -1,10 +1,19 @@
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [text, setText] = useState("No updates!");
+  const [isPending, startTransition] = useTransition();
+
+  const callBackend = async () => {
+    startTransition(async () => {
+      const backendResponse: Response = await fetch("https://menumanager.giavonator.deno.net");
+      setText(await backendResponse.text());
+    })
+  };
 
   return (
     <>
@@ -18,12 +27,13 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() =>  {
+          setCount((count) => count + 1);
+          callBackend();
+          }} disabled={isPending}>
           count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        </button> 
+        <p>{isPending ? "Updating..." : text}</p>
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more

@@ -1,8 +1,15 @@
-export function add(a: number, b: number): number {
-  return a + b;
-}
+import { Hono } from "@hono/hono";
+import { cors } from "@hono/hono/cors";
 
-// Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
-if (import.meta.main) {
-  console.log("Add 2 + 3 =", add(2, 3));
-}
+const app = new Hono();
+
+app.use("*", cors());
+
+app.get("/", () => {
+  console.log("We got a request!");
+  return new Response("Menu Manager server is running.");
+});
+
+console.log("Server listening");
+
+Deno.serve(app.fetch);
