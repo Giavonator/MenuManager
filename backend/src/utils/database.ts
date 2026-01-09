@@ -1,7 +1,7 @@
 import "@std/dotenv/load"; // loads `.env` file as environment variables
 import { Db, MongoClient } from "mongodb";
 
-async function initMongoClient() {
+async function initMongoClient(): Promise<MongoClient> {
   const DB_CONN = Deno.env.get("MONGODB_URL");
   if (DB_CONN === undefined) {
     throw new Error("Could not find environment variable: MONGODB_URL");
@@ -15,7 +15,7 @@ async function initMongoClient() {
   return client;
 }
 
-async function init() {
+async function initDb(): Promise<[MongoClient, string]> {
   const client = await initMongoClient();
   const DB_NAME = Deno.env.get("DB_NAME");
   if (DB_NAME === undefined) {
@@ -43,8 +43,8 @@ async function dropAllCollections(db: Db): Promise<void> {
  * MongoDB database configured by .env
  * @returns {[Db, MongoClient]} initialized database and client
  */
-export async function getDb() {
-  const [client, DB_NAME] = await init();
+export async function getDb(): Promise<[Db, MongoClient]> {
+  const [client, DB_NAME]: [MongoClient, string] = await initDb();
   return [client.db(DB_NAME), client] as [Db, MongoClient];
 }
 
@@ -52,10 +52,10 @@ export async function getDb() {
  * Test database initialization
  * @returns {[Db, MongoClient]} initialized test database and client
  */
-export async function testDb() {
-  const [client, DB_NAME] = await init();
+export async function testDb(): Promise<[Db, MongoClient]> {
+  const [client, DB_NAME]: [MongoClient, string] = await initDb();
   const test_DB_NAME = `test-${DB_NAME}`;
-  const test_Db = client.db(test_DB_NAME);
+  const test_Db: Db = client.db(test_DB_NAME);
   await dropAllCollections(test_Db);
   return [test_Db, client] as [Db, MongoClient];
 }

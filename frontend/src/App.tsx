@@ -10,7 +10,7 @@ function App() {
 
   const callBackend = async () => {
     startTransition(async () => {
-      const backendResponse: Response = await fetch("https://menumanager.giavonator.deno.net");
+      const backendResponse: Response = await fetch("https://menumanager.giavonator.deno.net/set-person?name=John&age=30");
       setText(await backendResponse.text());
     })
   };
@@ -35,9 +35,6 @@ function App() {
         </button> 
         <p>{isPending ? "Updating..." : text}</p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
